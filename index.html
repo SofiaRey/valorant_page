@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/x-icon" href="./imgs/LogoNav.svg">
     <title>Valorant</title>
   </head>
   <body>
@@ -48,7 +49,7 @@
           ningún momento memorable se verá igual.
         </p>
         <div class="borde-boton">
-          <a class="boton" href="#agentes">GENERAR ALEATORIOS</a>
+          <a class="boton" href="#generar-aleatorios">GENERAR ALEATORIOS</a>
         </div>
       </div>
     </section>
@@ -151,36 +152,30 @@
     </section>
     <section id="generar-equipamiento">
       <h3>GENERAR EQUIPAMIENTO</h3>
-      <div>
+      <form>
+        <p class="input-error"></p>
         <div class="contenedor-input">
-          <i class="material-icons">search</i>
-          <input id="buscar-nombre" type="text" />
+          <i class="material-icons">monetization_on</i>
+          <input id="input-dinero" type="text" />
         </div>
         <div>
-          <span>Cantidad de jugadores:</span>
-          <select id="cantidad-jugadores">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
+          <span>Agente:</span>
+          <select id="agentes-select"></select>
         </div>
         <div>
-          <span>Cantidad de jugadores:</span>
-          <select id="cantidad-jugadores">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
+          <span>Mapa:</span>
+          <select id="mapa-select"></select>
         </div>
-        <div class="borde-boton">
+        <div id="generar-equip-boton" class="borde-boton">
           <a class="boton">GENERAR</a>
         </div>
+      </form>
+      <div class="contenedor-equip-borde">
+        <div class="contenedor-equipamiento-generado">
+          <img src="./imgs/Chamber.png" alt="">
+          <h3>+</h3>
+        </div>
       </div>
-      <div></div>
     </section>
     <section id="footer">
       <img src="./imgs/CompleteLogo.png" alt="Valorant Logo" />

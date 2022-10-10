@@ -1,11 +1,11 @@
 const endpointAgentes =
   "https://valorant-api.com/v1/agents?language=es-MX&isPlayableCharacter=true";
 let agentes;
-
+const selectAgente = document.querySelector("#agentes-select");
 // --------------- Navbar item activo ---------------
 const navItems = document.querySelectorAll(".nav-item");
 for (var i = 0; i < navItems.length; i++) {
-  navItems[i].addEventListener("click", function() {
+  navItems[i].addEventListener("click", function () {
     var actual = document.getElementsByClassName("nav-activa");
     actual[0].className = actual[0].className.replace(" nav-activa", "");
     this.className += " nav-activa";
@@ -56,6 +56,9 @@ fetch(endpointAgentes)
     mostrarInfoAgenteRoles(roles[0].id);
 
     agentes.map((e) => {
+      selectAgente.innerHTML += `
+      <option value='${e.displayName}'>${e.displayName}</option>
+      `;
       contenedorAspecto.innerHTML += `
         <div id="${e.uuid}" class="borde-aspecto">
           <img onclick="mostrarInfoAgente('${e.uuid}')" src="${e.displayIconSmall}" />
@@ -239,3 +242,134 @@ function mezclarArray(arr) {
   }
   return arr;
 }
+
+// --------------- Generar equipamiento ---------------
+
+const selectMapa = document.querySelector("#mapa-select");
+const generarEquipBoton = document.querySelector("#generar-equip-boton");
+const contenedorEquipamiento = document.querySelector(
+  ".contenedor-equip-borde"
+);
+let mapas;
+
+generarEquipBoton.addEventListener("click", () => {
+  if (validarDinero())
+    contenedorEquipamiento.classList.add("contenedor-equip-visible");
+});
+
+fetch("https://valorant-api.com/v1/maps?language=es-MX")
+  .then((response) => {
+    return response.json();
+  })
+  .then((body) => {
+    mapas = body.data;
+
+    mapas.map(
+      (e) =>
+        (selectMapa.innerHTML += `
+      <option value='${e.displayName}'>${e.displayName}</option>
+      `)
+    );
+  });
+
+function validarDinero() {
+  const inputDinero = document.querySelector("#input-dinero");
+  const error = document.querySelector(".input-error");
+  let esValido = false;
+
+  error.innerHTML = "";
+  if (inputDinero.value.length == 0) {
+    error.innerHTML = "Complete el campo";
+  } else if (isNaN(inputDinero.value)) {
+    error.innerHTML = "Ingrese un número";
+  } else if (inputDinero.value > 9000) {
+    error.innerHTML = "Máximo 9000";
+  } else if (inputDinero.value < 0) {
+    error.innerHTML = "Mínimo 0";
+  } else {
+    esValido = true;
+  }
+
+  if (esValido) {
+    error.classList.remove("input-error-visible");
+  } else {
+    error.classList.add("input-error-visible");
+  }
+  return esValido;
+}
+
+// Obtener escudos
+let escudos;
+fetch("https://valorant-api.com/v1/gear?language=es-MX")
+  .then((res) => {
+    return res.json();
+  })
+  .then((body) => {
+    escudos = body.data;
+  });
+
+// Obtener armas
+let armas;
+fetch("https://valorant-api.com/v1/weapons?language=es-MX")
+  .then((res) => {
+    return res.json();
+  })
+  .then((body) => {
+    armas = body.data;
+  });
+
+const generarEquipamiento = (dinero, agente, mapa) => {
+  switch (dinero) {
+    case dinero < 800:
+      
+      break;
+    case  800 < dinero < 3000:
+      
+      break;
+    case 3000 < dinero < 5000:
+      
+      break;
+
+    case dinero > 5000:
+      
+      break;
+  
+    default:
+      break;
+  }
+};
+// plata < 800
+
+// Chamber sherif
+// Controladores shorty
+// Duelistas frenzy
+// Iniciadores escudo ligero + classic
+// Centinelas ghost + escudo
+// Icebox classic
+
+// 800 < plata > 3000
+
+// Escudo pesado
+// Chamber Marshal
+// Brimstone judge
+// Duelistas y Controladores sherif
+// Centinelas Guardian
+// Iniciadores Bulldog y escudo ligero
+// Heaven, Bind escudo ligero
+
+// 3000 < plata > 5000
+
+// Menos por Raze, todos Vandal
+// Raze Phantom
+// Breach Ascent Odin
+// Todos escudo pesado
+// Pearl y Fracture todos Phantom
+
+// plata > 5000
+
+// Chamber sherif y operator
+// Todos escudo pesado
+// Jett Icebox operator
+// Todos ghost
+// Viper shorty
+// Bind todos frenzy
