@@ -216,8 +216,6 @@ generarAleatoriosBoton.addEventListener("click", () => {
   }
 
   mostrarAgentesAleatorios(agentesGenerados);
-
-  console.log(agentesGenerados);
 });
 
 const mostrarAgentesAleatorios = (agentesGenerados) => {
@@ -247,14 +245,60 @@ function mezclarArray(arr) {
 
 const selectMapa = document.querySelector("#mapa-select");
 const generarEquipBoton = document.querySelector("#generar-equip-boton");
+const inputDinero = document.querySelector("#input-dinero");
 const contenedorEquipamiento = document.querySelector(
   ".contenedor-equip-borde"
+);
+const contenedorEquipamientoGenerado = document.querySelector(
+  ".contenedor-equipamiento-generado"
 );
 let mapas;
 
 generarEquipBoton.addEventListener("click", () => {
-  if (validarDinero())
+  if (validarDinero()) {
     contenedorEquipamiento.classList.add("contenedor-equip-visible");
+    contenedorEquipamientoGenerado.innerHTML = "";
+
+    equipamientoGen = generarEquipamiento(
+      parseInt(inputDinero.value),
+      agentes.find((agente) => agente.displayName == selectAgente.value),
+      "mapa"
+    );
+
+    if (equipamientoGen["armaPrincipal"] != null) {
+      contenedorEquipamientoGenerado.innerHTML += `
+        <div>
+          <img src="${equipamientoGen["armaPrincipal"].imagen}" alt="Arma principal">
+          <h5>${equipamientoGen["armaPrincipal"].nombre}</h5>
+        </div>
+        <h3>+</h3>
+      `;
+    }
+    if (equipamientoGen["armaSecundaria"] != null) {
+      contenedorEquipamientoGenerado.innerHTML += `
+        <div>
+          <img src="${equipamientoGen["armaSecundaria"].imagen}" alt="Arma principal">
+          <h5>${equipamientoGen["armaSecundaria"].nombre}</h5>
+        </div>
+        <h3>+</h3>
+    `;
+    }
+    if (equipamientoGen["escudo"] != null) {
+      contenedorEquipamientoGenerado.innerHTML += `
+        <div>
+          <img src="${equipamientoGen["escudo"].imagen}" alt="Arma principal">
+          <h5>${equipamientoGen["escudo"].nombre}</h5>
+        </div>
+        <h3>+</h3>
+    `;
+    }
+    contenedorEquipamientoGenerado.innerHTML += `
+      <div>
+        <h2>${equipamientoGen["habilidades"]}<h2/>
+        <h6>Habilidades</h6>
+      <div/>
+    `;
+  }
 });
 
 fetch("https://valorant-api.com/v1/maps?language=es-MX")
@@ -273,7 +317,6 @@ fetch("https://valorant-api.com/v1/maps?language=es-MX")
   });
 
 function validarDinero() {
-  const inputDinero = document.querySelector("#input-dinero");
   const error = document.querySelector(".input-error");
   let esValido = false;
 
@@ -318,26 +361,106 @@ fetch("https://valorant-api.com/v1/weapons?language=es-MX")
     armas = body.data;
   });
 
-const generarEquipamiento = (dinero, agente, mapa) => {
-  switch (dinero) {
-    case dinero < 800:
-      
-      break;
-    case  800 < dinero < 3000:
-      
-      break;
-    case 3000 < dinero < 5000:
-      
-      break;
+// Prioridad: agente > mapa > rol
 
-    case dinero > 5000:
-      
-      break;
-  
-    default:
-      break;
+function generarEquipamiento(dinero, agente, mapa) {
+  const armaDefecto = armas.find((arma) => arma.displayName == "Classic");
+  let equipamiento = {
+    armaPrincipal: null,
+    armaSecundaria: {
+      imagen: armaDefecto.displayIcon,
+      nombre: armaDefecto.displayName,
+      precio: armaDefecto.shopData.cost,
+    },
+    escudo: null,
+    habilidades: null, // Las habilidades consisten en el dinero restante
+  };
+
+  function comprar(tipoArticulo, articulo) {
+    console.log("Articulo a comprar:");
+    console.log(articulo);
+    let dineroDisp = dinero;
+
+    // En caso de que este sobreescribiendo y alcance el dinero con el reembolso para comprar
+    if (
+      equipamiento[tipoArticulo] != null &&
+      dinero + equipamiento[tipoArticulo].precio >= articulo.shopData.cost
+    ) {
+      dineroDisp = dinero + equipamiento[tipoArticulo].precio;
+    }
+    if (dineroDisp < articulo.shopData.cost) return;
+
+    dinero = dineroDisp;
+
+    equipamiento[tipoArticulo] = {
+      imagen: articulo.displayIcon,
+      nombre: articulo.displayName,
+      precio: articulo.shopData.cost,
+    };
+
+    // Se descuenta del dinero total el articulo que se sumo al equipamiento
+    dinero -= parseInt(equipamiento[tipoArticulo].precio);
   }
-};
+
+  // Existen cuatro grados de equipamiento en función del dinero
+  if (dinero <= 800) {
+    switch (agente.role.displayName) {
+      case "Iniciador":
+        comprar("escudo", escudos[1]);
+        break;
+      case "Centinela":
+        comprar(
+          "armaSecundaria",
+          armas.find((arma) => arma.displayName == "Ghost")
+        );
+        break;
+      case "Duelista":
+        comprar(
+          "armaSecundaria",
+          armas.find((arma) => arma.displayName == "Frenzy")
+        );
+        break;
+      case "Controlador":
+        comprar(
+          "armaSecundaria",
+          armas.find((arma) => arma.displayName == "Shorty")
+        );
+        break;
+    }
+
+    if (agente.displayName == "Chamber") {
+      comprar(
+        "armaSecundaria",
+        armas.find((arma) => arma.displayName == "Sheriff")
+      );
+    }
+  } else if (dinero > 800 && dinero < 3000) {
+    console.log('entre 800 y 3000')
+  } else if (3000 < dinero && dinero < 6000) {
+    console.log('entre 3000 y 6000')
+  } else if (dinero >= 6000) {
+    console.log('mas de 6000')
+    comprar("escudo", escudos[0]);
+
+    comprar(
+      "armaPrincipal",
+      armas.find((arma) => arma.displayName == "Vandal")
+    );
+
+    if (agente.displayName == "Chamber" || agente.displayName == "Jett") {
+      comprar(
+        "armaPrincipal",
+        armas.find((arma) => arma.displayName == "Operator")
+      );
+    }
+  }
+
+  console.log("Equipamiento final:");
+  equipamiento["habilidades"] = dinero;
+  console.log(equipamiento);
+  return equipamiento;
+}
+
 // plata < 800
 
 // Chamber sherif
@@ -347,7 +470,7 @@ const generarEquipamiento = (dinero, agente, mapa) => {
 // Centinelas ghost + escudo
 // Icebox classic
 
-// 800 < plata > 3000
+// 800 < plata < 3000
 
 // Escudo pesado
 // Chamber Marshal
@@ -359,8 +482,8 @@ const generarEquipamiento = (dinero, agente, mapa) => {
 
 // 3000 < plata > 5000
 
-// Menos por Raze, todos Vandal
 // Raze Phantom
+// Menos por Raze, todos Vandal
 // Breach Ascent Odin
 // Todos escudo pesado
 // Pearl y Fracture todos Phantom
@@ -370,6 +493,5 @@ const generarEquipamiento = (dinero, agente, mapa) => {
 // Chamber sherif y operator
 // Todos escudo pesado
 // Jett Icebox operator
-// Todos ghost
 // Viper shorty
 // Bind todos frenzy

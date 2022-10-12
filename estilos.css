@@ -538,8 +538,16 @@ input {
   align-items: center;
 }
 
-.contenedor-equipamiento-generado img {
+.contenedor-equipamiento-generado > div {
   height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contenedor-equipamiento-generado > div > img {
+  height: 40%;
 }
 
 .contenedor-equip-borde {
