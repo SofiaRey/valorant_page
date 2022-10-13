@@ -24,6 +24,10 @@ a {
   color: #ebe8e2;
 }
 
+option {
+  color: #0d131a;
+}
+
 section {
   width: 100%;
 }
