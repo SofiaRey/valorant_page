@@ -335,6 +335,7 @@ h6 {
   border: solid 1px #0d131a;
   padding: 0px 20px;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .contenedor-roles div:hover,
